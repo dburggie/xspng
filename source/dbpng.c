@@ -1,44 +1,14 @@
+
 #include <dbpng.h>
+#include <dbpng_private.h>
+
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <zlib.h>
 
 
-/*
-		typedef uint8_t  dbpng_byte;
-		typedef uint32_t dbpng_int;
-
-		//primary image data structure
-		typedef struct {
-			dbpng_int width, height;
-			dbpng_byte * buffer;
-		} dbpng_image;
-
-		//pointer to the above-defined struct
-		typedef dbpng_image* dbpng_imagep;
-
-		//struct initialization functions
-		dbpng_imagep dbpng_new_image(dbpng_int width, dbpng_int height);
-		void dbpng_free_image(dbpng_imagep imgp);
-		void dbpng_image_init(dbpng_image *img);
-
-		//set a pixel to the given red-green-blue samples
-		void dbpng_set_rgb(
-				dbpng_imagep imgp, 
-				dbpng_int x, dbpng_int y, 
-				dbpng_byte r, dbpng_byte g, dbpng_byte b
-			);
-
-		//set a pixel to the given red-green-blue-alpha samples
-		void dbpng_set_rgba(
-				dbpng_imagep imgp,
-				dbpng_int x, dbpng_int y,
-				dbpng_byte r, dbpng_byte g, dbpng_byte b, dbpng_byte a
-			);
-
-		//write a dbpng_image struct to file
-		void dbpng_write_to_file(dbpng_imagep, const char * filename);
-
- */
 
 
 
@@ -160,6 +130,63 @@ void dbpng_set_rgba(
 	imgp->buffer[y * stride + x * 4 + 3] = a;
 }
 
+typedef struct {
+	dbpng_byte sig[4];
+	dbpng_int length;
+	dbpng_byte *buffer;
+	dbpng_int crc;
+} dbpng_chunk;
+
+
+typedef dbpng_chunk* dbpng_chunkp;
+
+
+static const dbpng_byte sig_ihdr[4] = { 0x49, 0x48, 0x44, 0x52 };
+static const dbpng_byte sig_idat[4] = { 0x49, 0x44, 0x41, 0x54 };
+static const dbpng_byte sig_iend[4] = { 0x49, 0x45, 0x4e, 0x44 };
+
+
+
+void dbpng_write_file_sig(FILE* fout);
+
+
+void dbpng_write_byte(FILE* fout, dbpng_byte b) {
+	fprintf(fout, "%c", b);
+}
+
+
+
+void dbpng_write_int(FILE* fout, dbpng_int i) {
+	dbpng_byte array[4], j;
+	for (j = 0; j < 4; j++) {
+		array[j] = 0xff & i;
+		i = i << 8;
+	}
+
+	for (j = 3; j >= 0; j--) {
+		dbpng_write_byte(fout, array[j]);
+	}
+}
+
+void dbpng_write_chunk(FILE* fout, dbpng_chunkp chunk);
+
+dbpng_int dbpng_calc_crc(dbpng_chunkp chunk);
+void dbpng_chunk_deflate(dbpng_chunkp chunk);
+
+dbpng_chunkp dbpng_make_ihdr(dbpng_imagep img);
+dbpng_chunkp dbpng_make_idat(dbpng_imagep img);
+dbpng_chunkp dbpng_make_iend();
+
+
+
+void dbpng_free_chunk(dbpng_chunkp chunk) {
+	if (chunk) {
+		if (chunk->buffer) {
+			free(chunk->buffer);
+		}
+		free(chunk);
+	}
+}
 
 
 
