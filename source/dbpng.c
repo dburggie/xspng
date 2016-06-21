@@ -2,12 +2,18 @@
 #include <dbpng.h>
 #include <dbpng_private.h>
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <stdio.h>  //fwrite, FILE*
+#include <stdint.h> //uint8_t, uint32_t
+#include <stdlib.h> //malloc, free
+#include <string.h> //memset
+#include <assert.h> //assert
 #include <zlib.h>
 
+static const dbpng_byte dbpng_sig_ihdr[4] = { 0x49, 0x48, 0x44, 0x52 };
+static const dbpng_byte dbpng_sig_idat[4] = { 0x49, 0x44, 0x41, 0x54 };
+static const dbpng_byte dbpng_sig_iend[4] = { 0x49, 0x45, 0x4e, 0x44 };
+
+static const dbpng_byte dbpng_sig_PNG[8] = {137, 80, 78, 71, 13, 10 26, 10}
 
 
 
@@ -130,42 +136,12 @@ void dbpng_set_rgba(
 	imgp->buffer[y * stride + x * 4 + 3] = a;
 }
 
-typedef struct {
-	dbpng_byte sig[4];
-	dbpng_int length;
-	dbpng_byte *buffer;
-	dbpng_int crc;
-} dbpng_chunk;
-
-
-typedef dbpng_chunk* dbpng_chunkp;
-
-
-static const dbpng_byte sig_ihdr[4] = { 0x49, 0x48, 0x44, 0x52 };
-static const dbpng_byte sig_idat[4] = { 0x49, 0x44, 0x41, 0x54 };
-static const dbpng_byte sig_iend[4] = { 0x49, 0x45, 0x4e, 0x44 };
 
 
 
-void dbpng_write_file_sig(FILE* fout);
-
-
-void dbpng_write_byte(FILE* fout, dbpng_byte b) {
-	fprintf(fout, "%c", b);
-}
-
-
-
-void dbpng_write_int(FILE* fout, dbpng_int i) {
-	dbpng_byte array[4], j;
-	for (j = 0; j < 4; j++) {
-		array[j] = 0xff & i;
-		i = i << 8;
-	}
-
-	for (j = 3; j >= 0; j--) {
-		dbpng_write_byte(fout, array[j]);
-	}
+void dbpng_write_file_sig(FILE* fout) {
+	assert(NULL != fout);
+	fwrite(dbpng_sig_PNG, 1, 8, fout);
 }
 
 void dbpng_write_chunk(FILE* fout, dbpng_chunkp chunk);
@@ -173,9 +149,75 @@ void dbpng_write_chunk(FILE* fout, dbpng_chunkp chunk);
 dbpng_int dbpng_calc_crc(dbpng_chunkp chunk);
 void dbpng_chunk_deflate(dbpng_chunkp chunk);
 
-dbpng_chunkp dbpng_make_ihdr(dbpng_imagep img);
-dbpng_chunkp dbpng_make_idat(dbpng_imagep img);
-dbpng_chunkp dbpng_make_iend();
+
+void dbpng_chunk_allocate(dbpng_chunkp chunk) {
+	assert(NULL != chunk);
+	assert(0 <= chunk->length);
+
+	if (chunk->sig) {
+		free(chunk->sig);
+		chunk->sig = NULL;
+		chunk->buffer = NULL;
+	}
+
+	size_t footprint = 4 + chunk->length;
+	chunk->sig = (dbpng_byte*) malloc(footprint * sizeof (dbpng_byte));
+	if (!chunk->sig) {
+		chunk->buffer = NULL;
+		return;
+	}
+
+	memset(chunk->sig, 0, footprint);
+	chunk->buffer = &(chunk->sig[4]);
+}
+
+
+void dbpng_chunk_set_sig(dbpng_chunkp chunk, dbpng_byte *sig);
+void dbpng_chunk_put_int(dbpng_chunkp chunk, int i, dbpng_int v);
+void dbpng_chunk_put_byte(dbpng_chunkp  chunk, int i, dbpng_byte v);
+
+
+dbpng_chunkp dbpng_make_IHDR(dbpng_imagep img) {
+
+	static const int iwidth = 0;
+	static const int iheight = 4;
+	static const int idepth = 8;
+	static const int ictype = 9;
+	static const int icomp = 10;
+	static const int ifilter = 11;
+	static const int iinterlace = 12;
+
+	dbpng_chunkp IHDR = (dbpng_chunkp) malloc(sizeof (dbpng_chunk));
+	if (!IHDR) return NULL;
+
+	IHDR->sig = NULL;
+	IHDR->buffer = NULL;
+	IHDR->length = 13;
+	dbpng_chunk_allocate(IHDR);
+
+	if (!IHDR->sig) {
+		free(IHDR);
+		return NULL;
+	}
+
+	dbpng_chunk_set_sig(IHDR, dbpng_sig_IHDR);
+	dbpng_chunk_put_int(IHDR, iwidth, img->width);
+	dbpng_chunk_put_int(IHDR, iheight, img->height);
+	dbpng_chunk_put_byte(IHDR, idepth, 8);
+	dbpng_chunk_put_byte(IHDR, ictype, 6);
+	dbpng_chunk_put_byte(IHDR, icomp, 0);
+	dbpng_chunk_put_byte(IHDR, ifilter, 0);
+	dbpng_chunk_put_byte(IHDR, iinterlace, 1);
+
+	dbpng_calc_crc(IHDR);
+
+	return IHDR;
+}
+
+
+
+dbpng_chunkp dbpng_make_IDAT(dbpng_imagep img);
+dbpng_chunkp dbpng_make_IEND();
 
 
 
