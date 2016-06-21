@@ -1,0 +1,9 @@
+build/
+
+*.swp
+*.tmp
+*.log
+*.o
+*.png
+
+
