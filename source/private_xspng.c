@@ -1,5 +1,12 @@
 
+#include <xspng.h>
+#include <private_xspng.h>
 
+#include <stdio.h>  //fwrite, FILE*
+#include <stdint.h> //uint8_t, uint32_t
+#include <stdlib.h> //malloc, free
+#include <string.h> //memset
+#include <assert.h> //assert
 
 
 static const xspng_byte xspng_sig_ihdr[4] = { 0x49, 0x48, 0x44, 0x52 };
@@ -133,12 +140,6 @@ void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig) {
 		chunk->sig[i] = sig[i];
 	}
 }
-
-
-
-//use zlib to compress a chunk's buffer
-//updates buffer size and length field
-void xspng_chunk_deflate(xspng_chunkp chunk); //todo
 
 
 
@@ -343,7 +344,6 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 	}
 	
 	assert(index == IDAT->length);
-	
 	
 	//now deflate the image data stream, calculate our crc, and return a finished chunk
 	
