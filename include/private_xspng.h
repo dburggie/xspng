@@ -34,7 +34,6 @@ namespace xspng {
 		xspng_chunkp xspng_make_IDAT(xspng_imagep img);
 		xspng_chunkp xspng_make_IEND();
 
-
 #ifdef __cplusplus
 	} //extern "C"
 } //namespace xspng

@@ -421,14 +421,20 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 		return NULL;
 	}
 	
-	//interlace image data
+	//interlace image data with Adam7 interlacing:
+	//perform seven passes over the entire image buffer
+	//in each pass, pick out pixels according to rules for that pass
+	//form these pixels into scanlines of a sub-image per pass
+	//prepend a zero byte denoting no scanline filter applied
+	//write these scanlines into our chunk data sequentially
+	
 	xspng_int index = 0;
 	xspng_int x, y, i; //for for loops
 	xspng_byte s; //for sample values
 	
-	//pass 1: y0=0, dy=8, x0=0, dx=8
+	//Adam7 pass 1: y0=0, dy=8, x0=0, dx=8
 	for (y = 0; y < img->height; y += 8) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 0; x < img->width; x += 8) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -436,9 +442,10 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 			}
 		}
 	}
-	//pass 2: y0=0, dy = 8, x0=4, dx=8
+	
+	//Adam7 pass 2: y0=0, dy = 8, x0=4, dx=8
 	for (y = 0; y < img->height; y += 8) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 4; x < img->width; x += 8) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -447,9 +454,9 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 		}
 	}
 	
-	//pass 3: y0=4, dy=8, x0=0, dx = 4
+	//Adam7 pass 3: y0=4, dy=8, x0=0, dx = 4
 	for (y = 4; y < img->height; y += 8) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 0; x < img->width; x += 4) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -459,9 +466,9 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 	}
 	
 	
-	//pass 4: y0=0, dy=4, x0=2, dx=4
+	//Adam7 pass 4: y0=0, dy=4, x0=2, dx=4
 	for (y = 0; y < img->height; y += 4) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 2; x < img->width; x += 4) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -470,9 +477,9 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 		}
 	}
 	
-	//pass 5: y0=2, dy=4, x0=0, dx=2
+	//Adam7 pass 5: y0=2, dy=4, x0=0, dx=2
 	for (y = 2; y < img->height; y += 4) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 0; x < img->width; x += 2) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -481,9 +488,9 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 		}
 	}
 	
-	//pass 6: y0=0, dy=2, x0=1, dx=2
+	//Adam7 pass 6: y0=0, dy=2, x0=1, dx=2
 	for (y = 0; y < img->height; y += 2) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 1; x < img->width; x += 2) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -492,9 +499,9 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 		}
 	}
 	
-	//pass 7: y0=1, dy=2, x0=0, dx=1
+	//Adam7 pass 7: y0=1, dy=2, x0=0, dx=1
 	for (y = 1; y < img->height; y += 2) {
-		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		xspng_chunk_put_byte(IDAT, index++, 0x00);
 		for (x = 0; x < img->width; x++) {
 			for (i = 0; i < 4; i++) {
 				s = img->buffer[y*stride+x*4+i];
@@ -504,6 +511,9 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 	}
 	
 	assert(index == IDAT->length);
+	
+	
+	//now deflate the image data stream, calculate our crc, and return a finished chunk
 	
 	xspng_deflate(IDAT);
 	xspng_calc_crc(IDAT);
