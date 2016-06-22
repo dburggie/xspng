@@ -140,6 +140,10 @@ void xspng_set_rgba(
 	imgp->buffer[y * stride + x * 4 + 3] = a;
 }
 
+
+
+void xspng_write_to_file(xspng_imagep, const char * filename) { }
+
 /* end implementation of declarations in xspng.h */
 
 
@@ -262,6 +266,17 @@ void xspng_chunk_allocate(xspng_chunkp chunk) {
 
 
 
+//free a chunkp object
+void xspng_free_chunk(xspng_chunkp chunk) {
+	if (chunk) {
+		if (chunk->sig) {
+			free(chunk->sig);
+		}
+		free(chunk);
+	}
+}
+
+
 //copy 4 bytes of chunk signature into chunk
 void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig) {
 	assert(NULL != chunk);
@@ -338,16 +353,6 @@ xspng_chunkp xspng_make_IHDR(xspng_imagep img) {
 
 
 
-//use zlib to compress a chunk's buffer
-//updates buffer size and length field
-void xspng_chunk_deflate(xspng_chunkp chunk); //todo
-
-
-
-//make an IDAT chunk from an imagep object
-//performs Adam7 interlacing and compression
-xspng_chunkp xspng_make_IDAT(xspng_imagep img);
-
 
 
 //make an IEND chunk (they are always the same
@@ -373,16 +378,140 @@ xspng_chunkp xspng_make_IEND() {
 
 
 
-//free a chunkp object
-void xspng_free_chunk(xspng_chunkp chunk) {
-	if (chunk) {
-		if (chunk->sig) {
-			free(chunk->sig);
-		}
-		free(chunk);
+//use zlib to compress a chunk's buffer
+//updates buffer size and length field
+void xspng_chunk_deflate(xspng_chunkp chunk); //todo
+
+
+
+//make an IDAT chunk from an imagep object
+//performs Adam7 interlacing and compression
+xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
+	assert(NULL != img);
+	assert(NULL != img->buffer);
+	assert(0 < img->width);
+	assert(0 < img->height);
+	
+	//figure out how big a buffer we need after interlacing
+	size_t stride = 4 * img->width;
+	size_t length = 4; //chunk signature
+	
+	//count bytes in 7 passes of interlaced scanlines
+	// (lead byte + samples per pixel * pixels per scanline) * (scanlines per pass)
+	length += (1 + 4 * (img->width + 7) / 8) * ((img->height + 7) / 8);//pass 1
+	length += (1 + 4 * (img->width + 3) / 8) * ((img->height + 7) / 8);//pass 2
+	length += (1 + 4 * (img->width + 3) / 4) * ((img->height + 3) / 8);//pass 3
+	length += (1 + 4 * (img->width + 1) / 4) * ((img->height + 3) / 4);//pass 4
+	length += (1 + 4 * (img->width + 1) / 2) * ((img->height + 1) / 4);//pass 5
+	length += (1 + 4 * (img->width + 0) / 2) * ((img->height + 1) / 2);//pass 6
+	length += (1 + 4 * (img->width + 0) / 1) * ((img->height + 0) / 2);//pass 7
+	
+	//initialize a new chunk
+	xspng_chunkp IDAT = (xspng_chunkp) malloc(sizeof (xspng_chunk));
+	if (!IDAT) return NULL;
+	IDAT->length = length;
+	IDAT->crc = 0;
+	IDAT->sig = NULL;
+	IDAT->buffer = NULL;
+	xspng_chunk_allocate(IDAT);
+	
+	//exit if allocation failure
+	if (!IDAT->sig) {
+		free(IDAT); 
+		return NULL;
 	}
+	
+	//interlace image data
+	xspng_int index = 0;
+	xspng_int x, y, i; //for for loops
+	xspng_byte s; //for sample values
+	
+	//pass 1: y0=0, dy=8, x0=0, dx=8
+	for (y = 0; y < img->height; y += 8) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 0; x < img->width; x += 8) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	//pass 2: y0=0, dy = 8, x0=4, dx=8
+	for (y = 0; y < img->height; y += 8) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 4; x < img->width; x += 8) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	
+	//pass 3: y0=4, dy=8, x0=0, dx = 4
+	for (y = 4; y < img->height; y += 8) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 0; x < img->width; x += 4) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	
+	
+	//pass 4: y0=0, dy=4, x0=2, dx=4
+	for (y = 0; y < img->height; y += 4) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 2; x < img->width; x += 4) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	
+	//pass 5: y0=2, dy=4, x0=0, dx=2
+	for (y = 2; y < img->height; y += 4) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 0; x < img->width; x += 2) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	
+	//pass 6: y0=0, dy=2, x0=1, dx=2
+	for (y = 0; y < img->height; y += 2) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 1; x < img->width; x += 2) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	
+	//pass 7: y0=1, dy=2, x0=0, dx=1
+	for (y = 1; y < img->height; y += 2) {
+		xspng_chunk_put_byte(IDAT, index++, 0x00); //no filter on scanline
+		for (x = 0; x < img->width; x++) {
+			for (i = 0; i < 4; i++) {
+				s = img->buffer[y*stride+x*4+i];
+				xspng_chunk_put_byte(IDAT,index++,s);
+			}
+		}
+	}
+	
+	assert(index == IDAT->length);
+	
+	xspng_deflate(IDAT);
+	xspng_calc_crc(IDAT);
+	
+	return IDAT;
 }
 
 
 
-void xspng_write_to_file(xspng_imagep, const char * filename) { }
+
+

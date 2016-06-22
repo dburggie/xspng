@@ -25,6 +25,7 @@ namespace xspng {
 		void xspng_calc_crc(xspng_chunkp chunk);
 		void xspng_chunk_deflate(xspng_chunkp chunk);
 		void xspng_chunk_allocate(xspng_chunkp chunk);
+		void xspng_free_chunk(xspng_chunkp chunk);
 		void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig);
 		void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v);
 		void xspng_chunk_put_byte(xspng_chunkp chunk, int i, xspng_byte b);
@@ -33,7 +34,6 @@ namespace xspng {
 		xspng_chunkp xspng_make_IDAT(xspng_imagep img);
 		xspng_chunkp xspng_make_IEND();
 
-		void xspng_free_chunk(xspng_chunkp chunk);
 
 #ifdef __cplusplus
 	} //extern "C"
