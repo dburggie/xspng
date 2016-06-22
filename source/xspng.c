@@ -148,6 +148,11 @@ void xspng_write_chunk(FILE* fout, xspng_chunkp chunk);
 
 
 
+
+
+/* CRC Handling
+ * */
+
 static unsigned long crc_table[256];
 static int crc_table_computed = 0;
 
@@ -169,6 +174,9 @@ static void make_crc_table() {
 	crc_table_computed = 1;
 }
 
+
+
+//update a running crc
 static xspng_int update_crc(xspng_int crc, xspng_byte * buf, size_t len) {
 	xspng_int c = crc;
 	int n;
@@ -182,6 +190,9 @@ static xspng_int update_crc(xspng_int crc, xspng_byte * buf, size_t len) {
 	return c;
 }
 
+
+
+//set the crc value of chunk
 void xspng_calc_crc(xspng_chunkp chunk) {
 	size_t len = chunk->length + 4;
 	chunk->crc = update_crc(0xffffffffL, chunk->sig, len) ^ 0xffffffffL;
@@ -189,9 +200,15 @@ void xspng_calc_crc(xspng_chunkp chunk) {
 
 
 
+
+
+//use zlib to compress a chunk's buffer
+//updates buffer size and length field
 void xspng_chunk_deflate(xspng_chunkp chunk);
 
 
+
+//allocate a chunk's buffer to be at least big enough for it's length
 void xspng_chunk_allocate(xspng_chunkp chunk) {
 	assert(NULL != chunk);
 	assert(0 <= chunk->length);
@@ -214,20 +231,51 @@ void xspng_chunk_allocate(xspng_chunkp chunk) {
 }
 
 
-void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig);
-void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v);
-void xspng_chunk_put_byte(xspng_chunkp  chunk, int i, xspng_byte v);
+
+//copy 4 bytes of chunk signature into chunk
+void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig) {
+	assert(NULL != chunk);
+	assert(NULL != sig);
+	assert(NULL != chunk->sig);
+
+	int i;
+	for (i = 0; i < 4; i++) {
+		chunk->sig[i] = sig[i];
+	}
+}
+
+
+
+//write a 32 bit int into the buffer (msb first) at the given index
+void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v) {
+	assert(NULL != chunk);
+	assert(NULL != chunk->sig);
+	assert(NULL != chunk->buffer);
+	assert(0 <= i);
+	assert(i + 3 < chunk->length);
+
+	int j; for (j = 0; j < 4; j++) {
+		chunk->buffer[i + j] = 0xff & (v >> (8*j));
+	}
+}
+
+
+
+//write a byte into the buffer at the given index
+void xspng_chunk_put_byte(xspng_chunkp  chunk, int i, xspng_byte v) {
+	assert(NULL != chunk);
+	assert(NULL != chunk->sig);
+	assert(NULL != chunk->buffer);
+	assert(0 <= i);
+	assert(i < chunk->length);
+
+	chunk->buffer[i] = v;
+}
 
 
 xspng_chunkp xspng_make_IHDR(xspng_imagep img) {
-
-	static const int iwidth = 0;
-	static const int iheight = 4;
-	static const int idepth = 8;
-	static const int ictype = 9;
-	static const int icomp = 10;
-	static const int ifilter = 11;
-	static const int iinterlace = 12;
+	assert(NULL != img);
+	assert(NULL != img->buffer);
 
 	xspng_chunkp IHDR = (xspng_chunkp) malloc(sizeof (xspng_chunk));
 	if (!IHDR) return NULL;
@@ -243,13 +291,13 @@ xspng_chunkp xspng_make_IHDR(xspng_imagep img) {
 	}
 
 	xspng_chunk_set_sig(IHDR, xspng_sig_IHDR);
-	xspng_chunk_put_int(IHDR, iwidth, img->width);
-	xspng_chunk_put_int(IHDR, iheight, img->height);
-	xspng_chunk_put_byte(IHDR, idepth, 8);
-	xspng_chunk_put_byte(IHDR, ictype, 6);
-	xspng_chunk_put_byte(IHDR, icomp, 0);
-	xspng_chunk_put_byte(IHDR, ifilter, 0);
-	xspng_chunk_put_byte(IHDR, iinterlace, 1);
+	xspng_chunk_put_int(IHDR, 4, img->width);
+	xspng_chunk_put_int(IHDR, 4, img->height);
+	xspng_chunk_put_byte(IHDR, 8, 8);
+	xspng_chunk_put_byte(IHDR, 9, 6);
+	xspng_chunk_put_byte(IHDR, 10, 0);
+	xspng_chunk_put_byte(IHDR, 11, 0);
+	xspng_chunk_put_byte(IHDR, 12, 1);
 
 	xspng_calc_crc(IHDR);
 
