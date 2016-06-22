@@ -1,6 +1,5 @@
 
-#include <xspng.h>
-#include <private_xspng.h>
+#include <xspng.h> //implementing this api
 
 #include <stdio.h>  //fwrite, FILE*
 #include <stdint.h> //uint8_t, uint32_t
@@ -118,9 +117,5 @@ void xspng_image_set_rgba(
 	img->buffer[y * stride + x * 4 + 2] = b;
 	img->buffer[y * stride + x * 4 + 3] = a;
 }
-
-
-
-void xspng_image_write(xspng_imagep img, const char * filename) { }
 
 
