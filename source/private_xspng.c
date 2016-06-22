@@ -1,6 +1,6 @@
 
-#include <xspng.h>
-#include <private_xspng.h>
+#include <xspng.h> //need these typedefs
+#include <private_xspng.h> //implementing these
 
 #include <stdio.h>  //fwrite, FILE*
 #include <stdint.h> //uint8_t, uint32_t
