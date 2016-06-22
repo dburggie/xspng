@@ -11,12 +11,15 @@ extern "C" {
 
 	typedef struct {
 		xspng_int length;
-		xspng_byte *sig;
-		xspng_byte *buffer; //literally (sig+4)
 		xspng_int crc;
+		xspng_byte *sig;
+		xspng_byte *buffer;
 	} xspng_chunk;
+	//note that sig and buffer are contiguous in memory
 	
 	typedef xspng_chunk* xspng_chunkp;
+	
+	
 	
 	//return a new chunk object with no allocated buffer
 	xspng_chunkp xspng_chunk_new();
