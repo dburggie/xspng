@@ -12,16 +12,14 @@ namespace xspng {
 
 		typedef struct {
 			xspng_int length;
-			xspng_byte sig[4];
-			xspng_byte *buffer;
+			xspng_byte *sig;
+			xspng_byte *buffer; //literally (sig+4)
 			xspng_int crc;
 		} xspng_chunk;
 
 		typedef xspng_chunk* xspng_chunkp;
 
 		void xspng_write_file_sig(FILE* fout);
-		void xspng_write_int(FILE* fout, xspng_int i);
-		void xspng_write_byte(FILE* fout, xspng_byte b);
 		void xspng_write_chunk(FILE* fout, xspng_chunkp chunk);
 
 		void xspng_calc_crc(xspng_chunkp chunk);
