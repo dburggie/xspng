@@ -37,32 +37,29 @@ void xspng_image_write(xspng_imagep img, const char * filename) {
 	xspng_chunkp IEND = xspng_make_IEND();
 	
 	//ensure we got all our chunks
+	int do_write = 1;
 	if (!IHDR || !IHDR->sig || !IHDR->buffer) {
 		fprintf(stderr, chunk_fail, "IHDR");
-		fclose(fout);
-		fout = NULL;
-		return;
+		do_write = 0;
 	}
 	
 	if (!IDAT || !IDAT->sig || !IDAT->buffer) {
 		fprintf(stderr, chunk_fail, "IDAT");
-		fclose(fout);
-		fout = NULL;
-		return;
+		do_write = 0;
 	}
 	
 	if (!IEND || !IEND->sig) {
 		fprintf(stderr, chunk_fail, "IEND");
-		fclose(fout);
-		fout = NULL;
-		return;
+		do_write = 0;
 	}
 	
 	//write file
-	xspng_write_file_sig(fout);
-	xspng_write_chunk(fout,IHDR);
-	xspng_write_chunk(fout,IDAT);
-	xspng_write_chunk(fout,IEND);
+	if (do_write) {
+		xspng_write_file_sig(fout);
+		xspng_write_chunk(fout,IHDR);
+		xspng_write_chunk(fout,IDAT);
+		xspng_write_chunk(fout,IEND);
+	}
 	
 	//close file
 	fclose(fout);
