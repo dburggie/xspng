@@ -58,26 +58,26 @@ namespace xspng {
 		typedef xspng_image* xspng_imagep;
 
 		//struct initialization functions
-		xspng_imagep xspng_new_image(xspng_int width, xspng_int height);
-		void xspng_free_image(xspng_imagep imgp);
+		xspng_imagep xspng_image_new(xspng_int width, xspng_int height);
+		void xspng_image_free(xspng_imagep imgp);
 		void xspng_image_init(xspng_image *img);
 
 		//set a pixel to the given red-green-blue samples
-		void xspng_set_rgb(
+		void xspng_image_set_rgb(
 				xspng_imagep imgp, 
 				xspng_int x, xspng_int y, 
 				xspng_byte r, xspng_byte g, xspng_byte b
 			);
 
 		//set a pixel to the given red-green-blue-alpha samples
-		void xspng_set_rgba(
+		void xspng_image_set_rgba(
 				xspng_imagep imgp,
 				xspng_int x, xspng_int y,
 				xspng_byte r, xspng_byte g, xspng_byte b, xspng_byte a
 			);
 
 		//write a xspng_image struct to file
-		void xspng_write_to_file(xspng_imagep, const char * filename);
+		void xspng_image_write(xspng_imagep, const char * filename);
 
 
 

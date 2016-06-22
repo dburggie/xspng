@@ -29,23 +29,23 @@ I recommend using the pointer type `xspng_imagep`.
 The only functions you should need are the following:
 
     //allocate a new xspng_image of with the right buffer size
-    xspng_imagep xspng_new_image(xspng_int width, xspng_int height);
+    xspng_imagep xspng_image_new(xspng_int width, xspng_int height);
     
     //free a xspng_imagep and it's buffer
-    void xspng_free_image(xspng_imagep img);
+    void xspng_image_free(xspng_imagep img);
     
     //write a xspng_imagep to file
-    void xspng_write_to_file(xspng_imagep img, const char * filename);
+    void xspng_image_write(xspng_imagep img, const char * filename);
     
     //set a pixel to the given rgb sample values
-    void xspng_set_rgb(
+    void xspng_image_set_rgb(
         xspng_imagep img,
         xspng_int x, xspng_int y,
         xspng_byte r, xspng_byte g, xspng_byte b
       );
     
     //set a pixel to the given rgba sample values
-    void xspng_set_rgba(
+    void xspng_image_set_rgba(
         xspng_imagep img,
         xspng_int x, xspng_int y,
         xspng_byte r, xspng_byte g, xspng_byte b, xspng_byte a
@@ -61,7 +61,7 @@ The only functions you should need are the following:
       xspng_int w = 256, h = 256;
       
       //allocate image buffer
-      xspng_imagep imgp = xspng_new_image(w,h);
+      xspng_imagep imgp = xspng_image_new(w,h);
       
       //iterate through x,y coordinates and set rgb values
       xspng_int x,y;
@@ -71,12 +71,12 @@ The only functions you should need are the following:
           r = 0xff & x;
           g = 0xff & y;
           b = 0xff & ((x + y) / 2)
-          xspng_set_pixel(imgp,x,y,r,g,b);
+          xspng_image_set_pixel(imgp,x,y,r,g,b);
         }
       }
       
       //write to file
-      xspng_write_to_file(imgp, "output.png");
+      xspng_image_write(imgp, "output.png");
       
       return 0;
     }
