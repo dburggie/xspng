@@ -37,7 +37,7 @@ extern "C" {
 	void xspng_chunk_set_sig(xspng_chunkp chunk, const xspng_byte *sig);
 	
 	//transform chunk-data to zlib format
-	void xspng_chunk_deflate(xspng_chunkp chunk);
+	xspng_chunkp xspng_chunk_deflate(xspng_chunkp chunk);
 	
 	//calculate and set a chunk's crc value
 	void xspng_chunk_set_crc(xspng_chunkp chunk);
