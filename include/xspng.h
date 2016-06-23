@@ -49,7 +49,7 @@ extern "C" {
 
 	//primary image data structure
 	typedef struct {
-		xspng_int width, height;
+		xspng_int width, height, stride, size;
 		xspng_byte * buffer;
 	} xspng_image;
 
@@ -83,39 +83,6 @@ extern "C" {
 /* end anti-prototype-mangling protections */
 #ifdef __cplusplus
 } // extern "C"
-
-/*
-	class Color {
-		public:
-			xspng_byte r, g, b, a;
-
-			Color();
-			Color(int r, int g, int b);
-			Color(int r, int g, int b, int a);
-			Color(xspng_byte r, xspng_byte g, xspng_byte b);
-			Color(xspng_byte r, xspng_byte g, xspng_byte b, xspng_byte a);
-			Color(double r, double g, double b);
-			Color(double r, double g, double b, double a);
-	};
-
-	class Image {
-		private:
-			xspng_int width, height;
-			xspng_imagep imgp;
-		public:
-			Image();
-			Image(int width, int height);
-			Image(xspng_int width, xspng_int height);
-			~Image();
-
-			void setSize(int width, int height);
-			void setSize(xspng_int width, xspng_int height);
-
-			void setPixel(int x, int y, Color c);
-
-			void write(const char * filename);
-	};
- */
 #endif /* __cplusplus */
 
 

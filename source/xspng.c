@@ -21,6 +21,8 @@ xspng_imagep xspng_image_new(xspng_int width, xspng_int height) {
 	img->buffer = NULL;
 	img->width = width;
 	img->height = height;
+	img->stride = 0;
+	img->size = 0;
 
 	xspng_image_init(img);
 
@@ -36,6 +38,8 @@ void xspng_image_free(xspng_imagep img) {
 			free(img->buffer);
 			img->width = 0;
 			img->height = 0;
+			img->size = 0;
+			img->stride = 0;
 			img->buffer = NULL;
 		}
 		free(img);
@@ -51,15 +55,17 @@ void xspng_image_init(xspng_image *img) {
 	assert(0 < img->height);
 
 	if (img->buffer) free(img->buffer);
+	
+	img->stride = img->width * 4;
+	img->size = img->stride * img->height * 4 * sizeof(xspng_byte);
 
-	size_t footprint = img->width * img->height * 4 * sizeof(xspng_byte);
-	size_t stride = img->width * 4;
-
-	img->buffer = (xspng_byte*) malloc(footprint);
+	img->buffer = (xspng_byte*) malloc(img->size);
 	
 	if (!img->buffer) {
 		img->width = 0;
 		img->height = 0;
+		img->stride = 0;
+		img->size = 0;
 	}
 	
 	else {
@@ -90,10 +96,9 @@ void xspng_image_set_rgb(
 	assert(x < img->width);
 	assert(y < img->height);
 
-	xspng_int stride = 4 * img->width;
-	img->buffer[y * stride + x * 4    ] = r;
-	img->buffer[y * stride + x * 4 + 1] = g;
-	img->buffer[y * stride + x * 4 + 2] = b;
+	img->buffer[y * img->stride + x * 4    ] = r;
+	img->buffer[y * img->stride + x * 4 + 1] = g;
+	img->buffer[y * img->stride + x * 4 + 2] = b;
 }
 
 
@@ -111,11 +116,10 @@ void xspng_image_set_rgba(
 	assert(x < img->width);
 	assert(y < img->height);
 
-	xspng_int stride = 4 * img->width;
-	img->buffer[y * stride + x * 4    ] = r;
-	img->buffer[y * stride + x * 4 + 1] = g;
-	img->buffer[y * stride + x * 4 + 2] = b;
-	img->buffer[y * stride + x * 4 + 3] = a;
+	img->buffer[y * img->stride + x * 4    ] = r;
+	img->buffer[y * img->stride + x * 4 + 1] = g;
+	img->buffer[y * img->stride + x * 4 + 2] = b;
+	img->buffer[y * img->stride + x * 4 + 3] = a;
 }
 
 
