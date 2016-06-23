@@ -6,12 +6,12 @@
 int main() {
 	
 	xspng_byte r,g,b;
-
 	xspng_int w = 512, h = 512;
 
 	xspng_imagep img = xspng_image_new(w,h);
-
 	assert(img != NULL);
+	assert(img->width == w);
+	assert(img->height == h);
 	
 	int x,y;
 
