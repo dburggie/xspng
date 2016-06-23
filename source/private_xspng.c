@@ -9,11 +9,11 @@
 #include <assert.h> //assert
 
 
-static const xspng_byte xspng_sig_ihdr[4] = { 0x49, 0x48, 0x44, 0x52 };
-static const xspng_byte xspng_sig_idat[4] = { 0x49, 0x44, 0x41, 0x54 };
-static const xspng_byte xspng_sig_iend[4] = { 0x49, 0x45, 0x4e, 0x44 };
+static const xspng_byte xspng_sig_IHDR[4] = { 0x49, 0x48, 0x44, 0x52 };
+static const xspng_byte xspng_sig_IDAT[4] = { 0x49, 0x44, 0x41, 0x54 };
+static const xspng_byte xspng_sig_IEND[4] = { 0x49, 0x45, 0x4e, 0x44 };
 
-static const xspng_byte xspng_sig_PNG[8] = {137, 80, 78, 71, 13, 10 26, 10}
+static const xspng_byte xspng_sig_PNG[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
 /* * * * * * * * * * * * * * * * * * * *
  * * * * * begin CRC utilites  * * * * *
@@ -114,7 +114,7 @@ void xspng_chunk_allocate(xspng_chunkp chunk) {
 	chunk->sig = (xspng_byte*) malloc(footprint * sizeof (xspng_byte));
 	
 	if (!chunk->sig) {
-		chunk->buffer = NULL
+		chunk->buffer = NULL;
 	}
 	
 	else {
@@ -129,7 +129,7 @@ void xspng_chunk_allocate(xspng_chunkp chunk) {
 
 
 //copy 4 bytes of chunk signature into chunk
-void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig) {
+void xspng_chunk_set_sig(xspng_chunkp chunk, const xspng_byte *sig) {
 	assert(NULL != chunk);
 	assert(NULL != sig);
 	assert(NULL != chunk->sig);

@@ -15,8 +15,8 @@ xspng_imagep xspng_image_new(xspng_int width, xspng_int height) {
 	assert(0 < width);
 	assert(0 < height);
 
-	xspng_imagep imgp = (xspng_imagep) malloc(sizeof (xspng_image));
-	if (!imgp) return NULL;
+	xspng_imagep img = (xspng_imagep) malloc(sizeof (xspng_image));
+	if (!img) return NULL;
 
 	img->buffer = NULL;
 	img->width = width;
@@ -30,7 +30,7 @@ xspng_imagep xspng_image_new(xspng_int width, xspng_int height) {
 
 
 //free an imagep object (and it's buffer) you're done with
-void xspng_image_free(xspng_imagep imgp) {
+void xspng_image_free(xspng_imagep img) {
 	if (img) {
 		if (img->buffer) {
 			free(img->buffer);

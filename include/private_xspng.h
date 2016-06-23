@@ -34,7 +34,7 @@ extern "C" {
 	void xspng_chunk_allocate(xspng_chunkp chunk);
 	
 	//set a chunk's 4-byte signature
-	void xspng_chunk_set_sig(xspng_chunkp chunk, xspng_byte *sig);
+	void xspng_chunk_set_sig(xspng_chunkp chunk, const xspng_byte *sig);
 	
 	//transform chunk-data to zlib format
 	void xspng_chunk_deflate(xspng_chunkp chunk);
