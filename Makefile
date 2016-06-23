@@ -44,6 +44,7 @@ tests: ${TBLD} ${TEXE}
 
 ${TBLD}/example: ${TBLD}/example.o ${OBJ}
 	${CC} -o $@ $^ ${ZLIB}
+	./$@
 
 ${TBLD}/example.o: ${TSRC}/example.c ${HDR}
 	${CC} -o $@ -c $<

@@ -23,7 +23,7 @@ int main() {
 		xspng_image_set_rgb(img,x,y,r,g,b);
 	}
 
-	xspng_image_write(img, "bullshit.png");
+	xspng_image_write(img, "example.png");
 
 	xspng_image_free(img);
 

@@ -164,7 +164,7 @@ void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v) {
 	assert(i + 3 < chunk->length);
 
 	int j; for (j = 0; j < 4; j++) {
-		chunk->buffer[i + j] = 0xff & (((unsigned)v) >> (8 * (3-j)));
+		chunk->buffer[i + j] = 0xff & (v >> (8 * (3-j)));
 	}
 }
 
@@ -394,9 +394,9 @@ void xspng_write_chunk(FILE* fout, xspng_chunkp chunk) {
 	//ensure big-endian byte order for length and crc
 	xspng_byte lenbuf[4];
 	xspng_byte crcbuf[4];
-	int i; for (i = 0; i < 3; i++) {
-		lenbuf[3-i] = 0xff & (chunk->length >> (8 * i));
-		crcbuf[3-i] = 0xff & (chunk->crc >> (8 * i));
+	int i; for (i = 0; i < 4; i++) {
+		lenbuf[i] = 0xff & (chunk->length >> (8 * (3 - i)));
+		crcbuf[i] = 0xff & (chunk->crc    >> (8 * (3 - i)));
 	}
 	
 	//write length
