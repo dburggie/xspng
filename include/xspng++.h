@@ -2,6 +2,8 @@
 #ifndef __XSPNGPP_H
 #define __XSPNGPP_H
 
+#include <xspng.h>
+
 namespace xspng {
 	
 	class Color {
