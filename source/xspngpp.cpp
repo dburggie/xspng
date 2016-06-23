@@ -84,7 +84,7 @@ Image::Image() {
 
 
 Image::Image(unsigned int width, unsigned int height) {
-	width = height = 0;
+	this->width = this->height = 0;
 	imgp = NULL;
 	setSize(width,height);
 }

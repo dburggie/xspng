@@ -1,0 +1,27 @@
+#include <xspngpp.h>
+
+using namespace xspng;
+
+
+
+int main() {
+	int w = 256, h = 256;
+
+	Image img(w,h);
+	Color c;
+
+	for (int y = 0; y < h; y++)
+	for (int x = 0; x < w; x++) {
+		c.r = x;
+		c.g = y;
+		c.b = (x + y) / 2;
+		img.setPixel(x,y,c);
+	}
+
+	img.write("examplepp.png");
+
+	return 0;
+}
+
+
+

@@ -43,8 +43,8 @@ ${BLD}/xspngpp.o: ${SRC}/xspngpp.cpp ${HDRPP}
 
 TSRC = test
 TBLD = ${BLD}/test
-TOBJ = ${TBLD}/example.o
-TEXE = ${TBLD}/example
+TOBJ = ${TBLD}/example.o ${TBLD}/examplepp.o
+TEXE = ${TBLD}/example ${TBLD}/examplepp
 
 tests: ${TBLD} ${TEXE}
 
@@ -55,6 +55,12 @@ ${TBLD}/example: ${TBLD}/example.o ${OBJ}
 ${TBLD}/example.o: ${TSRC}/example.c ${HDR}
 	${CC} -o $@ -c $<
 
+${TBLD}/examplepp: ${TBLD}/examplepp.o ${OBJ} ${OBJPP}
+	${CPPC} -o $@ $^ ${ZLIB}
+	./$@
+
+${TBLD}/examplepp.o: ${TSRC}/examplepp.cpp ${HDRPP}
+	${CPPC} -o $@ -c $<
 
 
 
