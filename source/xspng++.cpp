@@ -1,6 +1,8 @@
 
 #include <xspng.h>
-#include <xspng++>
+#include <xspng++.h>
+#include <cassert> //assert
+#include <cstring> //memcpy
 
 using namespace xspng;
 
@@ -22,7 +24,7 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b) {
 
 
 
-Color::Color(int r, int g, int b) {
+Color::Color(unsigned int r, unsigned int g, unsigned int b) {
 	this->r = 0xff & r;
 	this->g = 0xff & g;
 	this->b = 0xff & b;
@@ -31,7 +33,7 @@ Color::Color(int r, int g, int b) {
 
 
 
-Color::Color(int r, int g, int b, int a) {
+Color::Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a) {
 	this->r = 0xff & r;
 	this->g = 0xff & g;
 	this->b = 0xff & b;
@@ -81,7 +83,7 @@ Image::Image() {
 
 
 
-Image::Image(int width, int height) {
+Image::Image(unsigned int width, unsigned int height) {
 	width = height = 0;
 	imgp = NULL;
 	setSize(width,height);
@@ -108,7 +110,7 @@ Image::~Image() {
 
 
 
-void Image::setSize(int width, int height) {
+void Image::setSize(unsigned int width, unsigned int height) {
 	assert(0 < width);
 	assert(0 < height);
 	this->width = width;
@@ -119,12 +121,12 @@ void Image::setSize(int width, int height) {
 	}
 	imgp = xspng_image_new(width, height);
 	assert(imgp);
-	assert(imgp->buffer)
+	assert(imgp->buffer);
 }
 
 
 
-void Image::setPixel(int x, int y, Color c) {
+void Image::setPixel(unsigned int x, unsigned int y, Color c) {
 	assert(imgp != NULL);
 	assert(imgp->buffer != NULL);
 	assert(0 <= x);
@@ -137,7 +139,7 @@ void Image::setPixel(int x, int y, Color c) {
 
 
 
-void Image::setPixel(int x, int y, int r, int g, int b) {
+void Image::setPixel(unsigned int x, unsigned int y, unsigned int r, unsigned int g, unsigned int b) {
 	assert(imgp != NULL);
 	assert(imgp->buffer != NULL);
 	assert(0 <= x);

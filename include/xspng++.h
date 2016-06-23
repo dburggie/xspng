@@ -12,8 +12,9 @@ namespace xspng {
 
 			Color();
 			Color(unsigned char r, unsigned char g, unsigned char b);
-			Color(int r, int g, int b);
-			Color(int r, int g, int b, int a);
+			Color(unsigned int r, unsigned int g, unsigned int b);
+			Color(unsigned int r, 
+					unsigned int g, unsigned int b, unsigned int a);
 			Color(double r, double g, double b);
 			Color(double r, double g, double b, double a);
 	};
@@ -24,13 +25,15 @@ namespace xspng {
 			xspng_imagep imgp;
 		public:
 			Image();
-			Image(int width, int height);
+			Image(unsigned int width, unsigned int height);
+			Image(const Image & image);
 			~Image();
 
-			void setSize(int width, int height);
+			void setSize(unsigned int width, unsigned int height);
 
-			void setPixel(int x, int y, Color c);
-			void setPixel(int x, int y, int r, int g, int b);
+			void setPixel(unsigned int x, unsigned int y, Color c);
+			void setPixel(unsigned int x, unsigned int y, 
+					unsigned int r, unsigned int g, unsigned int b);
 
 			void write(const char * filename);
 	};
