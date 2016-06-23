@@ -12,9 +12,9 @@ int main() {
 
 	for (int y = 0; y < h; y++)
 	for (int x = 0; x < w; x++) {
-		c.r = x;
-		c.g = y;
-		c.b = (x + y) / 2;
+		c.r = (4 * x) % 256;
+		c.g = (2 * y) % 256;
+		c.b = (x + y) % 256;
 		img.setPixel(x,y,c);
 	}
 
