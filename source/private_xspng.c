@@ -164,7 +164,7 @@ void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v) {
 	assert(i + 3 < chunk->length);
 
 	int j; for (j = 0; j < 4; j++) {
-		chunk->buffer[i + j] = (xspng_byte) (0xff & (v >> (8 * (3-j))));
+		chunk->buffer[i + j] = 0xff & (((unsigned)v) >> (8 * (3-j)));
 	}
 }
 
@@ -195,6 +195,8 @@ xspng_chunkp xspng_make_IHDR(xspng_imagep img) {
 	
 	IHDR->length = 13;
 	xspng_chunk_allocate(IHDR);
+	
+	assert(IHDR->length == 13);
 
 	if (!IHDR->sig) {
 		xspng_chunk_free(IHDR);
