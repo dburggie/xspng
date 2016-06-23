@@ -72,10 +72,10 @@ void xspng_image_init(xspng_image *img) {
 		xspng_int x, y;
 		for (y = 0; y < img->height; y++) {
 			for (x = 0; x < img->width; x++) {
-				img->buffer[y*stride + x*4 + 0] = 0x00;
-				img->buffer[y*stride + x*4 + 1] = 0x00;
-				img->buffer[y*stride + x*4 + 2] = 0x00;
-				img->buffer[y*stride + x*4 + 3] = 0xff;
+				img->buffer[y * img->stride + x * 4 + 0] = 0x00;
+				img->buffer[y * img->stride + x * 4 + 1] = 0x00;
+				img->buffer[y * img->stride + x * 4 + 2] = 0x00;
+				img->buffer[y * img->stride + x * 4 + 3] = 0xff;
 			}
 		}
 	}
