@@ -70,8 +70,8 @@ The only functions you should need are the following:
         for (x = 0; x < w; x++) {
           r = 0xff & x;
           g = 0xff & y;
-          b = 0xff & ((x + y) / 2)
-          xspng_image_set_pixel(imgp,x,y,r,g,b);
+          b = 0xff & ((x + y) / 2);
+          xspng_image_set_rgb(imgp,x,y,r,g,b);
         }
       }
       
