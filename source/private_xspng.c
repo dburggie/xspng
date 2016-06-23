@@ -164,14 +164,14 @@ void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v) {
 	assert(i + 3 < chunk->length);
 
 	int j; for (j = 0; j < 4; j++) {
-		chunk->buffer[i + 3 - j] = 0xff & (v >> (8 * j));
+		chunk->buffer[i + j] = (xspng_byte) (0xff & (v >> (8 * (3-j))));
 	}
 }
 
 
 
 //write a byte into the buffer at the given index
-void xspng_chunk_put_byte(xspng_chunkp  chunk, int i, xspng_byte v) {
+void xspng_chunk_put_byte(xspng_chunkp chunk, int i, xspng_byte v) {
 	assert(NULL != chunk);
 	assert(NULL != chunk->sig);
 	assert(NULL != chunk->buffer || 0 == chunk->length);
