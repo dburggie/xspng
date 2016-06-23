@@ -3,15 +3,21 @@ SRC = source
 INC = include
 BLD = build
 
-ZLIB = -lz
+LIBZ  = libz/adler32.o libz/compress.o libz/crc32.o libz/deflate.o
+LIBZ += libz/gzclose.o libz/gzlib.o libz/gzread.o libz/gzwrite.o
+LIBZ += libz/infback.o libz/inffast.o libz/inflate.o libz/inftrees.o
+LIBZ += libz/trees.o libz/uncompr.o libz/zutil.o
+
+LIB  = lib
 
 CFLG = -Wall -ggdb
 CINC = -I${INC}
-COPT = ${CFLG} ${CINC}
+CLIB = -L${LIB}
+COPT = ${CFLG} ${CINC} ${CLIB}
 CC   = gcc ${COPT}
 CPPC = g++ -std=c++11 ${COPT}
 
-HDR  = ${INC}/xspng.h ${INC}/private_xspng.h
+HDR  = ${INC}/xspng.h ${INC}/private_xspng.h ${INC}/zlib.h
 
 OBJ  = ${BLD}/xspng.o ${BLD}/private_xspng.o
 OBJ += ${BLD}/xspng_image_write.o ${BLD}/xspng_chunk_deflate.o
@@ -20,9 +26,17 @@ HDRPP = ${INC}/xspngpp.h ${HDR}
 OBJPP = ${BLD}/xspngpp.o
 
 
+all: ${BLD} ${TBLD} dist
 
-all: ${BLD} ${TBLD} ${OBJ} ${OBJPP}
 
+
+dist: ${LIB} ${LIB}/libxspng.a ${LIB}/libxspngpp.a
+
+${LIB}/libxspng.a: ${OBJ} ${LIBZ}
+	ar rcs $@ $^
+
+${LIB}/libxspngpp.a: ${OBJ} ${OBJPP} ${LIBZ}
+	ar rcs $@ $^
 
 
 ${BLD}/xspng.o: ${SRC}/xspng.c ${HDR}
@@ -48,16 +62,14 @@ TEXE = ${TBLD}/example ${TBLD}/examplepp
 
 tests: ${TBLD} ${TEXE}
 
-${TBLD}/example: ${TBLD}/example.o ${OBJ}
-	${CC} -o $@ $^ ${ZLIB}
-	./$@
+${TBLD}/example: ${TBLD}/example.o ${LIB}/libxspng.a
+	${CC} -o $@ $< -lxspng
 
 ${TBLD}/example.o: ${TSRC}/example.c ${HDR}
 	${CC} -o $@ -c $<
 
-${TBLD}/examplepp: ${TBLD}/examplepp.o ${OBJ} ${OBJPP}
-	${CPPC} -o $@ $^ ${ZLIB}
-	./$@
+${TBLD}/examplepp: ${TBLD}/examplepp.o ${LIB}/libxspngpp.a
+	${CPPC} -o $@ $< -lxspngpp
 
 ${TBLD}/examplepp.o: ${TSRC}/examplepp.cpp ${HDRPP}
 	${CPPC} -o $@ -c $<
@@ -65,13 +77,17 @@ ${TBLD}/examplepp.o: ${TSRC}/examplepp.cpp ${HDRPP}
 
 
 ${BLD}:
-	mkdir -p ${BLD}
+	mkdir -p $@
 
 ${TBLD}:
 	mkdir -p $@
 
+${LIB}:
+	mkdir -p $@
+
 clean:
 	rm -f ${OBJ}
+	rm -f ${OBJPP}
 	rm -f ${TOBJ}
 	rm -f ${TEXE}
 

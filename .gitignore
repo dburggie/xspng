@@ -6,5 +6,6 @@ notes/
 *.log
 *.o
 *.png
+*.a
 
 
