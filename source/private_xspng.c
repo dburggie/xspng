@@ -150,7 +150,7 @@ void xspng_chunk_set_crc(xspng_chunkp chunk) {
 	assert(NULL != chunk->buffer || chunk->length == 0);
 	
 	size_t len = chunk->length + 4;
-	chunk->crc = update_crc(0xffffffffL, chunk->sig, len + 4) ^ 0xffffffffL;
+	chunk->crc = update_crc(0xffffffffL, chunk->sig, len) ^ 0xffffffffL;
 }
 
 
