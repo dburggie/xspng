@@ -1,6 +1,9 @@
+
 SRC = source
 INC = include
 BLD = build
+
+ZLIB = -lz
 
 CFLG = -Wall -ggdb
 CINC = -I${INC}
@@ -15,12 +18,8 @@ OBJ += ${BLD}/xspng_image_write.o ${BLD}/xspng_chunk_deflate.o
 
 
 
-all: ${OBJ}
+all: ${BLD} ${TBLD} ${OBJ}
 
-dirs: ${BLD}
-	mkdir -p ${BLD}
-
-clean:
 
 
 ${BLD}/xspng.o: ${SRC}/xspng.c ${HDR}
@@ -34,4 +33,33 @@ ${BLD}/xspng_image_write.o: ${SRC}/xspng_image_write.c ${HDR}
 
 ${BLD}/xspng_chunk_deflate.o: ${SRC}/xspng_chunk_deflate.c ${HDR}
 	${CC} -o $@ -c $<
+
+
+TSRC = test
+TBLD = ${BLD}/test
+TOBJ = ${TBLD}/example.o
+TEXE = ${TBLD}/example
+
+tests: ${TBLD} ${TEXE}
+
+${TBLD}/example: ${TBLD}/example.o ${OBJ}
+	${CC} -o $@ $^ ${ZLIB}
+
+${TBLD}/example.o: ${TSRC}/example.c ${HDR}
+	${CC} -o $@ -c $<
+
+
+
+
+${BLD}:
+	mkdir -p ${BLD}
+
+${TBLD}:
+	mkdir -p $@
+
+clean:
+	rm -f ${OBJ}
+	rm -f ${TOBJ}
+	rm -f ${TEXE}
+
 

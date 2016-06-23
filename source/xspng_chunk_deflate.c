@@ -41,7 +41,7 @@ xspng_chunkp xspng_chunk_deflate(xspng_chunkp chunk) {
 	xspng_chunkp target = xspng_chunk_new();
 	assert(NULL != target);
 	target->length = buffer_size - 4;
-	xspng_chunk_allocate(target)
+	xspng_chunk_allocate(target);
 	assert(NULL != target->sig);
 	xspng_chunk_set_sig(target, chunk->sig);
 	
@@ -56,7 +56,7 @@ xspng_chunkp xspng_chunk_deflate(xspng_chunkp chunk) {
 	if (ret != Z_OK) {
 		xspng_chunk_clear(chunk);
 		xspng_chunk_free(target);
-		return;
+		return NULL;
 	}
 	
 	//prepare for deflate

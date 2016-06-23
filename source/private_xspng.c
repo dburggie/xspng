@@ -144,13 +144,13 @@ void xspng_chunk_set_sig(xspng_chunkp chunk, const xspng_byte *sig) {
 
 
 //set the crc value of chunk
-void xspng_calc_crc(xspng_chunkp chunk) {
+void xspng_chunk_set_crc(xspng_chunkp chunk) {
 	assert(NULL != chunk);
 	assert(NULL != chunk->sig);
 	assert(NULL != chunk->buffer || chunk->length == 0);
 	
 	size_t len = chunk->length + 4;
-	chunk->crc = update_crc(0xffffffffL, chunk->sig, len) ^ 0xffffffffL;
+	chunk->crc = update_crc(0xffffffffL, chunk->sig + 4, len) ^ 0xffffffffL;
 }
 
 
@@ -164,7 +164,7 @@ void xspng_chunk_put_int(xspng_chunkp chunk, int i, xspng_int v) {
 	assert(i + 3 < chunk->length);
 
 	int j; for (j = 0; j < 4; j++) {
-		chunk->buffer[i + 3 - j] = 0xff & (v >> (8*j));
+		chunk->buffer[i + 3 - j] = 0xff & (v >> (8 * j));
 	}
 }
 
@@ -244,7 +244,7 @@ xspng_chunkp xspng_make_IDAT(xspng_imagep img) {
 	if (!scanlines) return NULL;
 	
 	//allocate chunk buffer
-	scanlines->length = length;
+	scanlines->length = length - 4;
 	xspng_chunk_allocate(scanlines);
 	if (!scanlines->sig) {
 		xspng_chunk_free(scanlines); 
