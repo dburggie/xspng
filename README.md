@@ -21,11 +21,7 @@ and alpha.
 #### The C API
 
 Use of `xspng` should be relatively obvious from the header file, but you may
-find the example code below illuminating otherwise. The process is basically:
-
-* initialize a `xspng_imagep` pointer with the `xspng_image_new(width,height)` function
-* use `xspng_image_set_rgb(imagep,x,y,r,g,b)` or `xspng_image_set_rgba(img,x,y,r,g,b,a)` to set the pixel values you want
-* use `xspng_image_write(imagep, filename)
+find the example code below illuminating otherwise.
 
 ###### Example code
 
@@ -61,8 +57,8 @@ find the example code below illuminating otherwise. The process is basically:
 
 #### The C++ API
 
-Two classes are provided by `xspngpp.h`: `xspng::Color` and `xspng::Image`.
-They should be pretty easy to use.
+Two classes are provided by `xspng.h`: `xspng::Color` and `xspng::Image`. They
+should be pretty easy to use.
 
 ###### C++ Example Code
 
@@ -93,8 +89,8 @@ They should be pretty easy to use.
 
 #### Dependencies
 
-This code depends on zlib version 1.2.8 to work properly. Other than standard C and
-C++ headers, no other libraries are used by this package. I've decided to ship the
-header and object files for zlib alongside xspng so that basically any build
-environment can compile my code.
+This code depends on zlib version 1.2.8 to work properly. Other than standard C
+and C++ headers, no other libraries are used by this package. I've decided to
+ship the header and object files for zlib alongside xspng so that basically any
+build environment can compile my code.
 
