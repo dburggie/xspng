@@ -14,41 +14,18 @@ also a pretty fun learning experience.
 `xspng` provides a simple api for drawing png files. It assumes you want an
 `rgb` or an `rbga` colored image, and that you want your image interlaced.
 `xspng` does not allow you to change these settings for ease of use (and
-implementation). A separate C++ specific API is also included.
-
-#### Typedefs
-
-Png files use 32 bit integers and 8 bit characters. Integers only use the
-least significant 31 bits, though. We define these types for you as `xspng_int`
-and `xspng_byte`. The image data sits in a struct of type `xspng_image`, though
-I recommend using the pointer type `xspng_imagep`.
+implementation). A separate C++ specific API is also included. Pixels consist
+of four channels of 8-bit unsigned integers, one each for red, green, blue,
+and alpha.
 
 #### The C API
 
-The only functions you should need are the following:
+Use of `xspng` should be relatively obvious from the header file, but you may
+find the example code below illuminating otherwise. The process is basically:
 
-    //allocate a new xspng_image of with the right buffer size
-    xspng_imagep xspng_image_new(xspng_int width, xspng_int height);
-    
-    //free a xspng_imagep and it's buffer
-    void xspng_image_free(xspng_imagep img);
-    
-    //write a xspng_imagep to file
-    void xspng_image_write(xspng_imagep img, const char * filename);
-    
-    //set a pixel to the given rgb sample values
-    void xspng_image_set_rgb(
-        xspng_imagep img,
-        xspng_int x, xspng_int y,
-        xspng_byte r, xspng_byte g, xspng_byte b
-      );
-    
-    //set a pixel to the given rgba sample values
-    void xspng_image_set_rgba(
-        xspng_imagep img,
-        xspng_int x, xspng_int y,
-        xspng_byte r, xspng_byte g, xspng_byte b, xspng_byte a
-      );
+* initialize a `xspng_imagep` pointer with the `xspng_image_new(width,height)` function
+* use `xspng_image_set_rgb(imagep,x,y,r,g,b)` or `xspng_image_set_rgba(img,x,y,r,g,b,a)` to set the pixel values you want
+* use `xspng_image_write(imagep, filename)
 
 ###### Example code
 
