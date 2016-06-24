@@ -22,7 +22,6 @@ HDR  = ${INC}/xspng.h ${INC}/private_xspng.h ${INC}/zlib.h
 OBJ  = ${BLD}/xspng.o ${BLD}/private_xspng.o
 OBJ += ${BLD}/xspng_image_write.o ${BLD}/xspng_chunk_deflate.o
 
-HDRPP = ${INC}/xspngpp.h ${HDR}
 OBJPP = ${BLD}/xspngpp.o
 
 
@@ -30,13 +29,11 @@ all: ${BLD} ${TBLD} dist
 
 
 
-dist: ${LIB} ${LIB}/libxspng.a ${LIB}/libxspngpp.a
+dist: ${LIB} ${LIB}/libxspng.a 
 
-${LIB}/libxspng.a: ${OBJ} ${LIBZ}
+${LIB}/libxspng.a: ${OBJ} ${OBJPP} ${LIBZ}
 	ar rcs $@ $^
 
-${LIB}/libxspngpp.a: ${OBJ} ${OBJPP} ${LIBZ}
-	ar rcs $@ $^
 
 
 ${BLD}/xspng.o: ${SRC}/xspng.c ${HDR}
@@ -51,7 +48,7 @@ ${BLD}/xspng_image_write.o: ${SRC}/xspng_image_write.c ${HDR}
 ${BLD}/xspng_chunk_deflate.o: ${SRC}/xspng_chunk_deflate.c ${HDR}
 	${CC} -o $@ -c $<
 
-${BLD}/xspngpp.o: ${SRC}/xspngpp.cpp ${HDRPP}
+${BLD}/xspngpp.o: ${SRC}/xspngpp.cpp ${HDR}
 	${CPPC} -o $@ -c $<
 
 
@@ -71,7 +68,7 @@ ${TBLD}/example.o: ${TSRC}/example.c ${HDR}
 ${TBLD}/examplepp: ${TBLD}/examplepp.o ${LIB}/libxspngpp.a
 	${CPPC} -o $@ $< -lxspngpp
 
-${TBLD}/examplepp.o: ${TSRC}/examplepp.cpp ${HDRPP}
+${TBLD}/examplepp.o: ${TSRC}/examplepp.cpp ${HDR}
 	${CPPC} -o $@ -c $<
 
 
