@@ -1,4 +1,4 @@
-#include <xspngpp.h>
+#include <xspng.h>
 
 using namespace xspng;
 

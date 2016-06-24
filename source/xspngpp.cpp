@@ -1,6 +1,5 @@
 
 #include <xspng.h>
-#include <xspngpp.h>
 #include <cassert> //assert
 #include <cstring> //memcpy
 
