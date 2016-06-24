@@ -114,5 +114,10 @@ They should be pretty easy to use.
         return 0;
     }
 
+#### Dependencies
 
+This code depends on zlib version 1.2.8 to work properly. Other than standard C and
+C++ headers, no other libraries are used by this package. I've decided to ship the
+header and object files for zlib alongside xspng so that basically any build
+environment can compile my code.
 
