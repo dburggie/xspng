@@ -3,17 +3,14 @@ SRC = source
 INC = include
 BLD = build
 
-LIBZ  = libz/adler32.o libz/compress.o libz/crc32.o libz/deflate.o
-LIBZ += libz/gzclose.o libz/gzlib.o libz/gzread.o libz/gzwrite.o
-LIBZ += libz/infback.o libz/inffast.o libz/inflate.o libz/inftrees.o
-LIBZ += libz/trees.o libz/uncompr.o libz/zutil.o
+#LIB  = /usr/lib
+LIB = -L/usr/lib/x86_64-linux-gnu
+LIB += -lz
 
-LIB  = lib
 
 CFLG = -Wall -ggdb
 CINC = -I${INC}
-CLIB = -L${LIB}
-COPT = ${CFLG} ${CINC} ${CLIB}
+COPT = ${CFLG} ${CINC}
 CC   = gcc ${COPT}
 CPPC = g++ -std=c++11 ${COPT}
 
@@ -29,9 +26,9 @@ all: ${BLD} ${TBLD} dist
 
 
 
-dist: ${LIB} ${LIB}/libxspng.a 
+dist: libxspng.a 
 
-${LIB}/libxspng.a: ${OBJ} ${OBJPP} ${LIBZ}
+libxspng.a: ${OBJ} ${OBJPP}
 	ar rcs $@ $^
 
 
